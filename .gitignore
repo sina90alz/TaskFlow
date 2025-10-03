@@ -1,0 +1,45 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+[Tt]emp/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+.history/
+
+# Visual Studio
+.vs/
+
+# NuGet
+*.nupkg
+*.snupkg
+*.nuspec
+packages/
+*.nuget.props
+*.nuget.targets
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# DotCover
+.idea/
+*.dotCover
+
+# Others
+*.dbmdl
+*.bak
+*.sqlite
+*.mdf
+*.ldf
+
+# Secrets
+appsettings.Development.json
