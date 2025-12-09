@@ -14,16 +14,22 @@ namespace TaskFlow.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<User?> GetByIdAsync(Guid id) =>
-            await _context.Users.FindAsync(id);
+        public async Task<User?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
+            await _context.Users.FindAsync(new object[] { id }, ct);
 
-        public async Task<User?> GetByEmailAsync(string email) =>
-            await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        public async Task<User?> GetByEmailAsync(string email, CancellationToken ct = default) =>
+            await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Email == email, ct);
 
-        public async Task AddAsync(User user)
-        {
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-        }
+        public async Task AddAsync(User user, CancellationToken ct = default) =>
+            await _context.Users.AddAsync(user, ct);
+
+        public void Update(User user) => _context.Users.Update(user);
+
+        public void Delete(User user) => _context.Users.Remove(user);
+
+        public async Task<IEnumerable<User>> GetAllAsync(CancellationToken ct = default) =>
+            await _context.Users.AsNoTracking().ToListAsync(ct);
     }
 }

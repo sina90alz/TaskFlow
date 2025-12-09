@@ -14,32 +14,26 @@ namespace TaskFlow.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<TaskItem?> GetByIdAsync(Guid id) =>
-            await _context.Tasks.FindAsync(id);
+        // Get a task by Id
+        public async Task<TaskItem?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
+            await _context.Tasks.FindAsync(new object[] { id }, ct);
 
-        public async Task<IEnumerable<TaskItem>> GetAllAsync() =>
-            await _context.Tasks.ToListAsync();
+        // Get all tasks (read-only)
+        public async Task<IEnumerable<TaskItem>> GetAllAsync(CancellationToken ct = default) =>
+            await _context.Tasks
+                .AsNoTracking()
+                .ToListAsync(ct);
 
-        public async Task AddAsync(TaskItem task)
-        {
-            await _context.Tasks.AddAsync(task);
-            await _context.SaveChangesAsync();
-        }
+        // Add a new task (does not call SaveChanges)
+        public async Task AddAsync(TaskItem task, CancellationToken ct = default) =>
+            await _context.Tasks.AddAsync(task, ct);
 
-        public async Task UpdateAsync(TaskItem task)
-        {
+        // Update an existing task
+        public void Update(TaskItem task) =>
             _context.Tasks.Update(task);
-            await _context.SaveChangesAsync();
-        }
 
-        public async Task DeleteAsync(Guid id)
-        {
-            var task = await _context.Tasks.FindAsync(id);
-            if (task != null)
-            {
-                _context.Tasks.Remove(task);
-                await _context.SaveChangesAsync();
-            }
-        }
+        // Delete a task by entity
+        public void Delete(TaskItem task) =>
+            _context.Tasks.Remove(task);
     }
 }
