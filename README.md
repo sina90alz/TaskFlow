@@ -6,7 +6,7 @@ It demonstrates best practices for building modern, scalable applications using 
 ---
 
 ## 🚀 Features
-- User registration & authentication
+- User registration & authentication (JWT auth)
 - Task creation, assignment, and status tracking
 - Clean Architecture:
   - **Domain** (Entities, business rules)
