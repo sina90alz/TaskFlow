@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
+
 using TaskFlow.Infrastructure.Data;
+using TaskFlow.Infrastructure.Identity;
 using TaskFlow.Application.Interfaces;
 using TaskFlow.Infrastructure.Repositories;
 
@@ -14,6 +17,10 @@ namespace TaskFlow.Infrastructure.Extensions
             // Database connection
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
+
+            // Identity database
+            services.AddDbContext<AppIdentityDbContext>(options =>
+                options.UseSqlServer(config.GetConnectionString("IdentityConnection")));
 
             // Repositories
             services.AddScoped<ITaskRepository, TaskRepository>();
