@@ -6,8 +6,16 @@ using TaskFlow.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
+// ASP.NET Core Identity setup
+builder.Services.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+})
+        .AddEntityFrameworkStores<AppIdentityDbContext>()
+        .AddDefaultTokenProviders();
 
 var key = builder.Configuration["Jwt:Key"]!; // store in appsettings.json
 var issuer = builder.Configuration["Jwt:Issuer"];
@@ -16,6 +24,7 @@ var audience = builder.Configuration["Jwt:Audience"];
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
@@ -27,30 +36,24 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         ValidIssuer = issuer,
-        ValidAudience = issuer,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+        ValidAudience = audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+        RoleClaimType = ClaimTypes.Role
     };
 });
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddAuthorization();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApplicationServices();
 
 //builder.Host.UseSerilog((ctx, lc) => lc
 //   .ReadFrom.Configuration(ctx.Configuration));
-
-// ASP.NET Core Identity setup
-builder.Services.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
-        {
-            options.User.RequireUniqueEmail = true;
-        })
-        .AddEntityFrameworkStores<AppIdentityDbContext>()
-        .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
@@ -61,9 +64,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseHttpsRedirection();
+
 app.MapControllers();
 
 app.Run();

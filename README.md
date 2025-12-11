@@ -12,7 +12,7 @@ It demonstrates best practices for building modern, scalable applications using 
   - **Domain** (Entities, business rules)
   - **Application** (CQRS, MediatR handlers)
   - **Infrastructure** (EF Core, Repositories)
-  - **API** (Controllers, Swagger)
+  - **API** (Controllers, Swagger, Postman)
 - Extensible design for future Machine Learning integration (e.g., task prioritization)
 
 ---

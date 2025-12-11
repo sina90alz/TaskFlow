@@ -13,12 +13,14 @@ namespace TaskFlow.API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<AppUser> _userManager;
+        private readonly UserManager<AppUser> _userManager;        
+        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         private readonly IConfiguration _configuration;
 
-        public AuthController(UserManager<AppUser> userManager, IConfiguration configuration)
+        public AuthController(UserManager<AppUser> userManager, RoleManager<IdentityRole<Guid>> roleManager, IConfiguration configuration)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
             _configuration = configuration;
         }
 
@@ -42,6 +44,12 @@ namespace TaskFlow.API.Controllers
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
+            var roleExists = await _roleManager.RoleExistsAsync(model.Role);
+            if (!roleExists)
+                return BadRequest("Role does not exist.");
+
+            await _userManager.AddToRoleAsync(user, model.Role);
+
             return Ok("User registered successfully");
         }
 
@@ -57,31 +65,42 @@ namespace TaskFlow.API.Controllers
             if (!isPasswordValid)
                 return Unauthorized("Invalid credentials");
 
-            var token = GenerateJwtToken(user);
+            // Get user roles
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var token = GenerateJwtToken(user, roles);
             return Ok(new { Token = token });
         }
 
-        private string GenerateJwtToken(AppUser user)
+        private string GenerateJwtToken(AppUser user, IList<string> roles)
         {
             var key = _configuration["Jwt:Key"];
             var issuer = _configuration["Jwt:Issuer"];
+            var audience = _configuration["Jwt:Audience"];
             var email = user.Email ?? "";
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, email),
+                new Claim(JwtRegisteredClaimNames.Email, email),
                 new Claim("id", user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
+
+            //Add each role as a claim
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key!));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
                 issuer: issuer,
-                audience: issuer,
+                audience: audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddHours(6),
                 signingCredentials: credentials
             );
 
