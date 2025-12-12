@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 // ASP.NET Core Identity setup

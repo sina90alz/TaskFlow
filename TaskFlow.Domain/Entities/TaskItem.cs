@@ -8,6 +8,5 @@ namespace TaskFlow.Domain.Entities
 
         // Foreign Key to User
         public Guid? UserId { get; set; }
-        public User? AssignedUser { get; set; }
     }
 }
