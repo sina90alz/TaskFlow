@@ -1,11 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using TaskFlow.Infrastructure.Identity;
-using TaskFlow.API.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using TaskFlow.API.Models;
+using TaskFlow.Infrastructure.Configurations;
+using TaskFlow.Infrastructure.Identity;
 
 namespace TaskFlow.API.Controllers
 {
@@ -16,12 +18,17 @@ namespace TaskFlow.API.Controllers
         private readonly UserManager<AppUser> _userManager;        
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         private readonly IConfiguration _configuration;
+        private readonly SecurityOption _securityOptions = null;
 
-        public AuthController(UserManager<AppUser> userManager, RoleManager<IdentityRole<Guid>> roleManager, IConfiguration configuration)
+        public AuthController(UserManager<AppUser> userManager, 
+                              RoleManager<IdentityRole<Guid>> roleManager, 
+                              IConfiguration configuration,
+                              IOptions<SecurityOption> securityOptions)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
+            _securityOptions = securityOptions.Value;
         }
 
         // POST: api/auth/register
@@ -74,9 +81,6 @@ namespace TaskFlow.API.Controllers
 
         private string GenerateJwtToken(AppUser user, IList<string> roles)
         {
-            var key = _configuration["Jwt:Key"];
-            var issuer = _configuration["Jwt:Issuer"];
-            var audience = _configuration["Jwt:Audience"];
             var email = user.Email ?? "";
 
             var claims = new List<Claim>
@@ -93,14 +97,14 @@ namespace TaskFlow.API.Controllers
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key!));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_securityOptions.Key!));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: issuer,
-                audience: audience,
+                issuer: _securityOptions.Issuer,
+                audience: _securityOptions.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(6),
+                expires: DateTime.UtcNow.AddMinutes(_securityOptions.ExpireMinutes),
                 signingCredentials: credentials
             );
 

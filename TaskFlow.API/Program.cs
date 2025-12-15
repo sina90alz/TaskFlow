@@ -1,13 +1,9 @@
 using Microsoft.AspNetCore.Identity;
-using Serilog;
+using TaskFlow.API;
+using TaskFlow.API.Extensions;
 using TaskFlow.Application.Extensions;
 using TaskFlow.Infrastructure.Extensions;
 using TaskFlow.Infrastructure.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.Security.Claims;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 // ASP.NET Core Identity setup
@@ -18,34 +14,11 @@ builder.Services.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
         .AddEntityFrameworkStores<AppIdentityDbContext>()
         .AddDefaultTokenProviders();
 
-var key = builder.Configuration["Jwt:Key"]!; // store in appsettings.json
-var issuer = builder.Configuration["Jwt:Issuer"];
-var audience = builder.Configuration["Jwt:Audience"];
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = issuer,
-        ValidAudience = audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
-        RoleClaimType = ClaimTypes.Role
-    };
-});
+builder.Services.AddCustomOptions(builder.Configuration);
+builder.Services.AddCustomSecurity(builder.Configuration);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
