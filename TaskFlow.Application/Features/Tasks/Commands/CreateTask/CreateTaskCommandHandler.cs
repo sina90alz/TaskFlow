@@ -21,9 +21,6 @@ public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, Guid>
             };        
 
             await _unitOfWork.Tasks.AddAsync(task, cancellationToken);
-            
-            // Commit changes to database
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return task.Id;
     }
