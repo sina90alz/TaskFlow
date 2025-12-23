@@ -9,11 +9,27 @@ namespace TaskFlow.Infrastructure.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<TaskItem> Tasks { get; set; }
+        public DbSet<Permission> Permissions => Set<Permission>();
+        public DbSet<UserPermission> UserPermissions => Set<UserPermission>();
 
-        // Optional: Fluent API config
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<UserPermission>()
+                .HasKey(up => new { up.UserId, up.PermissionId });
+
+            modelBuilder.Entity<UserPermission>()
+                .HasOne(up => up.Permission)
+                .WithMany()
+                .HasForeignKey(up => up.PermissionId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<UserPermission>()
+                .HasIndex(up => up.UserId);
+
+            modelBuilder.Entity<UserPermission>()
+                .HasIndex(up => up.PermissionId);
         }
     }
 }
