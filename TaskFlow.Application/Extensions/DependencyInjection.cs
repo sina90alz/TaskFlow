@@ -19,6 +19,7 @@ namespace TaskFlow.Application.Extensions
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
             // Register MediatR Pipeline Behaviors
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
 

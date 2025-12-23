@@ -14,6 +14,9 @@ builder.Services.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
         .AddEntityFrameworkStores<AppIdentityDbContext>()
         .AddDefaultTokenProviders();
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
 builder.Services.AddCustomOptions(builder.Configuration);
 builder.Services.AddCustomSecurity(builder.Configuration);
 

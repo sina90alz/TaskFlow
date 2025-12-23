@@ -25,6 +25,8 @@ namespace TaskFlow.Infrastructure.Extensions
             // Repositories
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IPermissionRepository, PermissionRepository>();
+            services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;

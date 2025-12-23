@@ -16,15 +16,14 @@ public class CurrentUserService : ICurrentUserService
     {
         get
         {
-            var userIdClaim = _httpContextAccessor
-                .HttpContext?
+            var userIdClaim = _httpContextAccessor.HttpContext?
                 .User?
-                .FindFirst(ClaimTypes.NameIdentifier)
-                ?.Value;
+                .FindFirstValue("id");
 
-            return userIdClaim != null
-                ? Guid.Parse(userIdClaim)
-                : Guid.Empty;
+            if (string.IsNullOrWhiteSpace(userIdClaim))
+                throw new UnauthorizedAccessException("UserId claim is missing");
+
+            return Guid.Parse(userIdClaim);
         }
     }
 }
