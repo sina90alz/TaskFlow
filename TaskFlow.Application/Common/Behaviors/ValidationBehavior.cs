@@ -1,9 +1,11 @@
 using FluentValidation;
 using MediatR;
+using TaskFlow.Application.Common.Interfaces;
 
 namespace TaskFlow.Application.Common.Behaviors
 {
-    public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    public class ValidationBehavior<TRequest, TResponse>
+        : IPipelineBehavior<TRequest, TResponse>
         where TRequest : notnull
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;

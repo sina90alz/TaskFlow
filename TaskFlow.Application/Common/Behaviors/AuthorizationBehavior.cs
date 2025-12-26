@@ -1,8 +1,10 @@
 using MediatR;
 using TaskFlow.Application.Common.Exceptions;
+using TaskFlow.Application.Common.Interfaces;
 
 public class AuthorizationBehavior<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : notnull
 {
     private readonly IPermissionService _permissionService;
     private readonly ICurrentUserService _currentUser;
