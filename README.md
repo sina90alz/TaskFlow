@@ -1,11 +1,11 @@
-# TaskFlow ✅
+# TaskFlow
 
 **TaskFlow** is a clean-architecture .NET 8 Web API project for managing tasks and users.  
 It demonstrates best practices for building modern, scalable applications using **C#**, **Entity Framework Core**, and **MediatR**.
 
 ---
 
-## 🚀 Features
+## Features
 - User registration & authentication (JWT auth)
 - Task creation, assignment, and status tracking
 - Clean Architecture:
@@ -17,7 +17,7 @@ It demonstrates best practices for building modern, scalable applications using 
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 - [.NET 8](https://dotnet.microsoft.com/)
 - [Entity Framework Core](https://learn.microsoft.com/en-us/ef/core/)
 - [MediatR](https://github.com/jbogard/MediatR)
@@ -26,7 +26,7 @@ It demonstrates best practices for building modern, scalable applications using 
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 ```plaintext
 TaskFlow/
  ├── TaskFlow.Domain/         # Entities & core business rules
