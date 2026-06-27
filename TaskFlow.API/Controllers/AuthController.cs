@@ -17,17 +17,14 @@ namespace TaskFlow.API.Controllers
     {
         private readonly UserManager<AppUser> _userManager;        
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
-        private readonly IConfiguration _configuration;
         private readonly SecurityOption _securityOptions = null;
 
         public AuthController(UserManager<AppUser> userManager, 
                               RoleManager<IdentityRole<Guid>> roleManager, 
-                              IConfiguration configuration,
                               IOptions<SecurityOption> securityOptions)
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            _configuration = configuration;
             _securityOptions = securityOptions.Value;
         }
 

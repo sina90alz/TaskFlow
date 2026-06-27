@@ -7,7 +7,7 @@ namespace TaskFlow.API.Extensions
         public static void AddCustomOptions(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<SecurityOption>(configuration.GetSection("Jwt"));
-            services.Configure<SecurityOption>(configuration.GetSection("Cors"));
+            services.Configure<CorsOption>(configuration.GetSection("Cors"));
         }
     }
 }
